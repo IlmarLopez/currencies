@@ -1,6 +1,7 @@
 package log
 
 import (
+	"os"
 	"strings"
 
 	"go.uber.org/zap"
@@ -32,23 +33,25 @@ func NewLoggerConfig(level zap.AtomicLevel) zap.Config {
 }
 
 // NewLogger returns a new Logger with the given level.
-func NewLogger(level string) (*zap.SugaredLogger, error) {
-	var _level zap.AtomicLevel
+func NewLogger() (*zap.SugaredLogger, error) {
+	var level zap.AtomicLevel
 
-	switch strings.ToLower(level) {
-	case "debug":
-		_level = zap.NewAtomicLevelAt(zap.DebugLevel)
-	case "info":
-		_level = zap.NewAtomicLevelAt(zap.InfoLevel)
-	case "warn":
-		_level = zap.NewAtomicLevelAt(zap.WarnLevel)
-	case "error":
-		_level = zap.NewAtomicLevelAt(zap.ErrorLevel)
-	default:
-		_level = zap.NewAtomicLevelAt(zap.InfoLevel)
+	if logLevel, ok := os.LookupEnv("LOG_LEVEL"); ok {
+		switch strings.ToLower(logLevel) {
+		case "debug":
+			level = zap.NewAtomicLevelAt(zap.DebugLevel)
+		case "info":
+			level = zap.NewAtomicLevelAt(zap.InfoLevel)
+		case "warn":
+			level = zap.NewAtomicLevelAt(zap.WarnLevel)
+		case "error":
+			level = zap.NewAtomicLevelAt(zap.ErrorLevel)
+		default:
+			level = zap.NewAtomicLevelAt(zap.InfoLevel)
+		}
 	}
 
-	cfg := NewLoggerConfig(_level)
+	cfg := NewLoggerConfig(level)
 	logger, err := cfg.Build()
 	if err != nil {
 		return nil, err
