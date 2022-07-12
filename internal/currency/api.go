@@ -24,8 +24,14 @@ type resource struct {
 // query handles the GET request for the currencies.
 func (r resource) query() func(c *gin.Context) {
 	return func(c *gin.Context) {
+		queryParameters := make(map[string]string)
+
+		currency := c.Param("currency")
+		queryParameters["finit"] = c.Request.URL.Query().Get("finit")
+		queryParameters["fend"] = c.Request.URL.Query().Get("fend")
+
 		ctx := c.Request.Context()
-		count, err := r.service.Count(ctx)
+		count, err := r.service.Count(ctx, currency, queryParameters)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to count currencies"})
 			return
@@ -33,7 +39,7 @@ func (r resource) query() func(c *gin.Context) {
 
 		pages := p.NewFromRequest(c.Request, count)
 
-		currencies, err := r.service.Query(ctx, pages.Offset(), pages.Limit())
+		currencies, err := r.service.Query(ctx, currency, queryParameters, pages.Offset(), pages.Limit())
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to get currencies"})
 			return

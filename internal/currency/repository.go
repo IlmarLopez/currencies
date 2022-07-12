@@ -11,9 +11,9 @@ import (
 // Repository is the interface that provides the currency repository.
 type Repository interface {
 	// Count returns the number of currencies.
-	Count(ctx context.Context) (int, error)
+	Count(ctx context.Context, currency string, queryParameters map[string]string) (int, error)
 	// Query returns the list of currencies with the given offset and limit.
-	Query(ctx context.Context, offset, limit int) ([]entity.Currency, error)
+	Query(ctx context.Context, currency string, queryParameters map[string]string, offset, limit int) ([]entity.Currency, error)
 }
 
 // repository is the implementation of the Repository interface.
@@ -31,7 +31,7 @@ func NewRepository(db *pgx.Conn, logger *zap.SugaredLogger) Repository {
 }
 
 // Count returns the number of currencies.
-func (r repository) Count(ctx context.Context) (int, error) {
+func (r repository) Count(ctx context.Context, currency string, queryParameters map[string]string) (int, error) {
 	var count int
 	err := r.db.QueryRow(ctx, "SELECT COUNT(*) FROM currencies").Scan(&count)
 	if err != nil {
@@ -42,7 +42,7 @@ func (r repository) Count(ctx context.Context) (int, error) {
 }
 
 // Query returns the list of currencies with the given offset and limit.
-func (r repository) Query(ctx context.Context, offset, limit int) ([]entity.Currency, error) {
+func (r repository) Query(ctx context.Context, currency string, queryParameters map[string]string, offset, limit int) ([]entity.Currency, error) {
 	var currencies []entity.Currency
 	rows, err := r.db.Query(ctx, "SELECT * FROM currencies LIMIT $1 OFFSET $2", limit, offset)
 	if err != nil {

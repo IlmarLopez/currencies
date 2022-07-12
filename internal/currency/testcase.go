@@ -9,8 +9,8 @@ import (
 
 // Service is the interface that provides the currency service.
 type Service interface {
-	Count(ctx context.Context) (int, error)
-	Query(ctx context.Context, offset, limit int) ([]Currency, error)
+	Count(ctx context.Context, currency string, queryParameters map[string]string) (int, error)
+	Query(ctx context.Context, currency string, queryParameters map[string]string, offset, limit int) ([]Currency, error)
 }
 
 // service is the implementation of the Service interface.
@@ -30,13 +30,13 @@ type Currency struct {
 }
 
 // Count returns the number of currencies.
-func (s service) Count(ctx context.Context) (int, error) {
-	return s.repo.Count(ctx)
+func (s service) Count(ctx context.Context, currency string, queryParameters map[string]string) (int, error) {
+	return s.repo.Count(ctx, currency, queryParameters)
 }
 
 // Query returns the list of currencies with the given offset and limit.
-func (s service) Query(ctx context.Context, offset, limit int) ([]Currency, error) {
-	items, err := s.repo.Query(ctx, offset, limit)
+func (s service) Query(ctx context.Context, currency string, queryParameters map[string]string, offset, limit int) ([]Currency, error) {
+	items, err := s.repo.Query(ctx, currency, queryParameters, offset, limit)
 	if err != nil {
 		return nil, err
 	}
