@@ -1,0 +1,4 @@
+dsn: "postgres://127.0.0.1/currencies?sslmode=disable&user=user1&password=password"
+api_key: ""
+intervalo: 10
+timeout: 10
